@@ -1,0 +1,6 @@
+train: custom_data/train/images
+val: custom_data/valid/images
+test: custom_data/test/images
+
+nc: 3
+names: ['paint', 'dent', 'crack']
