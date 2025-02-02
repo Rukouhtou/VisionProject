@@ -3,7 +3,7 @@
 # VisionProject
 해당 프로젝트는 비전AI 모델 서비스를 fastAPI서버를 사용해 client로 배포하는 내용을 담고 있습니다.
 
-웹캠이달린 클라이언트쪽에서는 서버와 영상 송수신 + 웹브라우저를 통한 모니터링,  
+웹캠이달린 클라이언트쪽에서는 WebSocket을 통하여 서버와 영상 송수신 + 웹브라우저를 통한 모니터링,  
 서버쪽에서는 fastAPI를 통해 받은 영상을 파인튜닝된 yolo모델로 처리후 다시 전송하는 역할을 합니다.
 
 ## Prerequisites
@@ -39,6 +39,8 @@ http://localhost:9000
 
 ##
 
+<br/>
+
 ## 이미지 데이터 & Annotation
 사진은 스마트폰을 사용해 찍었으며, 이미지는 3000x4000해상도의 jpg파일입니다.  
 yolo모델은 학습시에 이미지 사이즈를 비율을 유지한 채 자동 변환해주며, 전처리를 자동으로 해줍니다.[[1]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#resizing-images>) 저는 큰 차원 쪽 사이즈를 640으로 설정하였습니다.  
@@ -61,4 +63,21 @@ loss가 전반적으로 감소하는 성향을 보이며, 검증데이터의 los
 정밀도도 증가하고있으며, 물체 감지의 성능 측정 지표로 사용되는 mAP(mean Average Precision)도 증가하는 성향을 보이는 것을 보아,  
 전반적으로 잘 학습됐다고 보여집니다.  
 
+## 추론
+파인튜닝한 모델로 학습에 사용되지 않은 unseen데이터를 실시간 감지해 보았습니다.  
+실시간 감지 예시:
+
+https://github.com/user-attachments/assets/6780c168-8037-4199-8651-183d882c1623
+
+## 마치며
+fastAPI서버를 통한 모델 서비스 배포와 클라이언트의 상호작용에 대해 공부할 수 있었던 시간이었고, 생각보다 웹브라우저의 프레임도 잘 나오는 것 같습니다.  
+yolo모델의 학습자체도 잘 되는 것 같고 validation loss에서 보여진 노이즈는 yolo의 데이터 증강[[3]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#data-augmentation-methods>)으로 해결할 수 있을 것 같습니다.  
+하지만 조명 상태를 맞추기 어려웠고 웹캠의 화질이 낮다보니 paint같은 미세한건 잘 감지해내지 못했던건 개선사항으로 남았습니다.  
+
+  
+#### References
+Number Detection using YOLOV11. <https://www.kaggle.com/code/jadsherif/number-detection-using-yolov11/notebook>  
+[1]. Preprocessing Annotated Data - Ultralytics YOLO Docs. <https://docs.ultralytics.com/guides/preprocessing_annotated_data/#resizing-images>  
+[2]. Computer Vision Annotation Tool. <https://app.cvat.ai/tasks>  
+[3]. Data Augmentation Methods - Ultralytics YOLO Docs. <https://docs.ultralytics.com/guides/preprocessing_annotated_data/#data-augmentation-methods>
 
