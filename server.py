@@ -25,9 +25,9 @@ async def detect(file: UploadFile):
     results = model.predict(image)
 
     # yolo의 바운딩박스 데이터(텐서객체이므로 cpu메모리로 옮긴후 넘파이배열로 변환)
-    boxes = results[0].boxes.xyxy.cpu().tolist()
-    scores = results[0].boxes.conf.cpu().tolist()
-    classes = results[0].boxes.cls.cpu().tolist()
+    boxes = results[0].boxes.xyxy.cpu().numpy()
+    scores = results[0].boxes.conf.cpu().numpy()
+    classes = results[0].boxes.cls.cpu().numpy()
     
     # 클라이언트에서 쓸 리스트로 데이터를 반환
     output = []

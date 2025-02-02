@@ -126,7 +126,7 @@ async def home():
         <title>Real-Time Detection</title>
     </head>
     <body>
-        <h2>YOLO Real-Time Detection</h2>
+        <h2>edge 실시간 모니터링</h2>
         <img id="video_feed" width="640" height="480">
         <script>
             var ws = new WebSocket("ws://127.0.0.1:9000/ws");
