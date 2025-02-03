@@ -177,13 +177,14 @@ loss가 전반적으로 감소하는 성향을 보이며, 검증데이터의 los
 https://github.com/user-attachments/assets/6780c168-8037-4199-8651-183d882c1623
 
 ## 마치며
+validation loss에서 보여진 노이즈는 yolo의 데이터 증강[[7]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#data-augmentation-methods>)으로 해결할 수 있을 것 같습니다. 하지만 웹캠의 화질이 낮다보니 조명에 민감하고 paint같은 미세한걸 잘 감지해내지 못했던건 edge단에서의 예상치 못한 일이었습니다.  
+
 fastAPI서버를 통한 모델 서비스 배포와 클라이언트의 상호작용에 대해 공부할 수 있었던 시간이었습니다.  
 오토에버에 구축된 머신비전 시스템은 공장에 있는 Edge 비전 시스템(GPU)과 비전 통합관리 시스템 + 클라우드에 있는 AI 플랫폼간의 통신이며,  
 클라우드에서 모델을 배포하고, 비전 통합관리 시스템에선 받은 모델을 edge시스템으로 전달하고 모니터링하며, edge에서 실제로 inference해서 검사이미지를 다시 학습이미지로 공급하는 구조라고 알고있습니다.  
 이 때 공장의 머신비전 장비는 PLC같은 산업용 장비로, 좀 더 raw한 통신을 하므로 통신계층(OSI)의 저계층에 있는 socket을 사용하며,  
-프로젝트는 HTTP를 사용하므로 메시지형식의 데이터를 다루어 윗계층에 있는 websocket을 사용한다는 차이가 있다는걸 알게 되었습니다.  
+프로젝트는 HTTP상에서의 실시간 통신으로 영상재생을 하고, 메시지형식의 데이터를 다루므로 윗계층에 있는 WebSocket을 사용한다는 차이가 있다는걸 알게 되었습니다.  
 
-한편 validation loss에서 보여진 노이즈는 yolo의 데이터 증강[[7]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#data-augmentation-methods>)으로 해결할 수 있을 것 같습니다. 하지만 웹캠의 화질이 낮다보니 조명에 민감하고 paint같은 미세한건 잘 감지해내지 못했던건 개선할 사항으로 남았습니다.  
 
 <br/>
   
