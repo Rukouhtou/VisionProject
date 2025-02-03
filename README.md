@@ -189,7 +189,6 @@ fastAPI서버를 통한 모델 서비스 배포와 클라이언트의 상호작�
 <br/>
   
 #### References
-Number Detection using YOLOV11. <https://www.kaggle.com/code/jadsherif/number-detection-using-yolov11/notebook>  
 [1]. You Only Look Once: Unified, Real-Time Object Detection. <https://arxiv.org/abs/1506.02640>  
 [2]. Object Detection Architecture - Difference between 1 and 2 stage detector. <https://velog.io/@qtly_u/Object-Detection-Architecture-1-or-2-stage-detector-%EC%B0%A8%EC%9D%B4>  
 [3]. Overview of Ultralytics YOLO11. <https://docs.ultralytics.com/models/yolo11/>  
