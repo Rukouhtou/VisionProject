@@ -5,14 +5,31 @@
 
 웹캠이달린 클라이언트쪽에서는 WebSocket을 통하여 서버와 영상 송수신 + 웹브라우저를 통한 모니터링,  
 서버쪽에서는 fastAPI를 사용하여, 받은 영상을 파인튜닝된 yolo모델로 처리후 클라이언트로 다시 전송하는 역할을 합니다.
+  
+## 목차
+1. [Prerequisites](#1.-Prerequisites)
+2. [Install](#2.-Install)
+3. [How to use](#3.-How-to-use)
+4. [YOLO](#4.-YOLO)
+5. [이미지 데이터 & Annotation](#5.-이미지-데이터-&-Annotation)
+6. [학습](#6.-학습)
+7. [yaml 파일](#7.-yaml-파일)
+8. [fastAPI 배포 준비](#8.-fastAPI-배포-준비)
+9. [학습 결과](#9.-학습-결과)
+10. [데이터 증강](#10.-데이터-증강)
+11. [증강 후 학습 결과들](#11.-증강-후-학습-결과들)
+12. [추론](#12.-추론)
+13. [마치며](#13.-마치며)
 
-## Prerequisites
+<br><br>
+
+## 1. Prerequisites
 - Python 3.10.16
 - pip
 - conda
 - webcam
 
-## Install
+## 2. Install
 conda 가상환경을 만든 뒤 다음 커맨드를 이용하여 [yolo11](<https://github.com/ultralytics/ultralytics>)을 설치합니다:  
 ```
 pip install ultralytics
@@ -22,7 +39,7 @@ pip install ultralytics
 pip install -r requirements.txt
 ```
 
-## How to use
+## 3. How to use
 1. 한 터미널에서 서버를 실행합니다:
 ```
 python server.py
@@ -41,7 +58,7 @@ http://localhost:9000
 
 <br/>
 
-## YOLO
+## 4. YOLO
 yolo는 하나의 신경망을 통해서 이미지에서 바로 바운딩 박스와 클래스 확률을 예측하는 물체 감지 모델입니다.[[1]](<https://arxiv.org/abs/1506.02640>)  
 1-stage 디텍터인 yolo는, 여러 형태로 미리 지정된 앵커박스를 통해 바운딩박스를 찾는 Regional Proposal과  
 클래스를 분류하는 Classification이 CNN을 통해 동시에 이루어져 다른 이미지 감지 모델보다 속도가 빠른 것이 특징입니다.[[2]](<https://velog.io/@qtly_u/Object-Detection-Architecture-1-or-2-stage-detector-%EC%B0%A8%EC%9D%B4>)  
@@ -49,7 +66,7 @@ yolo는 하나의 신경망을 통해서 이미지에서 바로 바운딩 박스
 ![performance-comparison](https://github.com/user-attachments/assets/64a285a8-ec7f-4ab1-85f1-23bf2bf15e28)
 
 
-## 이미지 데이터 & Annotation
+## 5. 이미지 데이터 & Annotation
 사진은 스마트폰을 사용해 찍었으며, 이미지는 3000x4000해상도의 jpg파일입니다.  
 yolo모델은 학습시에 이미지 사이즈를 비율을 유지한 채 자동 변환해주며, 전처리를 자동으로 해줍니다.[[4]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#resizing-images>) 여기서는 큰 차원 쪽 사이즈를 640으로 설정하였습니다.  
 사진은 차 부품 결함 검사를 가정해 paint(도장 결함), dent(움푹 패임), crack(금이 감) 3가지 클래스로 나누었습니다.  
@@ -57,7 +74,7 @@ yolo모델은 학습시에 이미지 사이즈를 비율을 유지한 채 자동
 총 50장의 사진을 7:2:1의 비율로 train, val, test셋으로 나눴으며, 각각 35, 10, 5장의 사진입니다.  
 데이터는 [cvat](<https://app.cvat.ai/tasks>)[[5]](<https://app.cvat.ai/tasks>)을 이용하여 annotation했습니다.
 
-## 학습
+## 6. 학습
 저는 윈도우환경이라서 WSL2 + Ubuntu20.04.5로 가상 리눅스 환경을 만들어 학습을 돌렸습니다.  
 ##### 빠른 학습 - 다음 커맨드를 실행합니다:
 ```
@@ -94,7 +111,7 @@ def main():
 .
 ```
 
-## yaml 파일
+## 7. yaml 파일
 프로젝트 폴더 내의 yaml_creator.py로 만들거나, 다른 yaml파일을 복사후 수정해서 사용합니다.  
 이 때, 데이터셋의 경로와 nc(클래스 수), names(클래스 이름)를 준비한 데이터셋에 맞게 수정해줍니다.  
 ```yaml
@@ -106,7 +123,7 @@ nc: 3
 names: ['paint', 'dent', 'crack']
 ```
   
-## fastAPI 배포 준비
+## 8. fastAPI 배포 준비
 server.py에 해당하는 코드 일부입니다.  
 fastAPI를 통해 내가 원하는 형태로의 배포가 쉽다는걸 보여주기위해 바운딩박스의 커스터마이징이나 라벨크기 같은 요소[[6]](<https://www.kaggle.com/code/jadsherif/number-detection-using-yolov11/notebook>)를 넣어봤습니다.  
 ```python
@@ -163,7 +180,7 @@ async def detect(file: UploadFile):
 .
 ```
 
-## 학습 결과
+## 9. 학습 결과
 ![results](https://github.com/user-attachments/assets/e22decdc-62c9-4497-8277-76a4bdddbdc7)
 
 loss가 전반적으로 감소하는 성향을 보이며, 검증데이터의 loss는 노이즈가 있는걸 봐서 데이터셋이 작아서 생긴 과적합일 수도 있겠습니다.  
@@ -171,7 +188,7 @@ loss가 전반적으로 감소하는 성향을 보이며, 검증데이터의 los
 적은 데이터셋 치고는 전반적으로 잘 학습됐다고 보여집니다.  
 여기서 이 변동폭이 큰 학습양상을 잡기위해, 추가적으로 데이터를 증강하여 데이터셋 수 자체를 늘려 학습해보겠습니다.  
 
-## 데이터 증강
+## 10. 데이터 증강
 빠르고 편리한 증강이 가능항 albumentations라이브러리를 설치합니다.  
 ```
 pip install albumentations
@@ -235,7 +252,7 @@ def main():
 .
 ```
 
-## 증강 후 학습 결과들
+## 11. 증강 후 학습 결과들
 runs/detect/  
 <details><summary>train15:</summary>  
 해당 시도에선 itertools의 combinations를 이용,  
@@ -373,13 +390,13 @@ train22:
 ![results](https://github.com/user-attachments/assets/4048787e-28e2-4c7d-9a5f-653355d1a20f)
 
 
-## 추론
+## 12. 추론
 파인튜닝한 모델로 학습에 사용되지 않은 unseen데이터를 실시간 감지해 보았습니다.  
 실시간 감지 예시:
 
 https://github.com/user-attachments/assets/6780c168-8037-4199-8651-183d882c1623
 
-## 마치며
+## 13. 마치며
 데이터 증강[[7]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#data-augmentation-methods>)과 학습 파라미터 조절로 처음보다는 어느정도 일반화된 모델을 학습할 수 있었습니다. 하지만 usb로 연결된 웹캠의 화질이 낮다보니 조명에 민감하고 paint같은 미세한걸 잘 감지해내지 못했던건 edge단에서의 예상치 못한 일이었습니다.  
 
 fastAPI서버를 통한 모델 서비스 배포와 클라이언트의 상호작용에 대해 공부할 수 있었던 시간이었습니다.  
