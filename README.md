@@ -4,7 +4,7 @@
 해당 프로젝트는 비전AI 모델 서비스를 fastAPI서버를 사용해 client로 배포하는 내용을 담고 있습니다.
 
 웹캠이달린 클라이언트쪽에서는 WebSocket을 통하여 서버와 영상 송수신 + 웹브라우저를 통한 모니터링,  
-서버쪽에서는 fastAPI를 통해 받은 영상을 파인튜닝된 yolo모델로 처리후 다시 전송하는 역할을 합니다.
+서버쪽에서는 fastAPI를 사용하여, 받은 영상을 파인튜닝된 yolo모델로 처리후 클라이언트로 다시 전송하는 역할을 합니다.
 
 ## Prerequisites
 - Python 3.10.16
@@ -51,8 +51,8 @@ yolo는 하나의 신경망을 통해서 이미지에서 바로 바운딩 박스
 
 ## 이미지 데이터 & Annotation
 사진은 스마트폰을 사용해 찍었으며, 이미지는 3000x4000해상도의 jpg파일입니다.  
-yolo모델은 학습시에 이미지 사이즈를 비율을 유지한 채 자동 변환해주며, 전처리를 자동으로 해줍니다.[[4]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#resizing-images>) 저는 큰 차원 쪽 사이즈를 640으로 설정하였습니다.  
-사진은 차 부품 결함 검사를 가장해 paint(도장 결함), dent(움푹 패임), crack(금이 감) 3가지 클래스로 나누었습니다.  
+yolo모델은 학습시에 이미지 사이즈를 비율을 유지한 채 자동 변환해주며, 전처리를 자동으로 해줍니다.[[4]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#resizing-images>) 여기서는 큰 차원 쪽 사이즈를 640으로 설정하였습니다.  
+사진은 차 부품 결함 검사를 가정해 paint(도장 결함), dent(움푹 패임), crack(금이 감) 3가지 클래스로 나누었습니다.  
 포스트잇을 사용하였으며 칼로 긁어내어 paint, 볼펜 뒷끝으로 꾹 눌러 dent, 칼로 흠집을 내어 crack을 표현하였습니다.  
 총 50장의 사진을 7:2:1의 비율로 train, val, test셋으로 나눴으며, 각각 35, 10, 5장의 사진입니다.  
 데이터는 [cvat](<https://app.cvat.ai/tasks>)[[5]](<https://app.cvat.ai/tasks>)을 이용하여 annotation했습니다.
@@ -177,18 +177,18 @@ loss가 전반적으로 감소하는 성향을 보이며, 검증데이터의 los
 https://github.com/user-attachments/assets/6780c168-8037-4199-8651-183d882c1623
 
 ## 마치며
+validation loss에서 보여진 노이즈는 yolo의 데이터 증강[[7]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#data-augmentation-methods>)으로 해결할 수 있을 것 같습니다. 하지만 웹캠의 화질이 낮다보니 조명에 민감하고 paint같은 미세한걸 잘 감지해내지 못했던건 edge단에서의 예상치 못한 일이었습니다.  
+
 fastAPI서버를 통한 모델 서비스 배포와 클라이언트의 상호작용에 대해 공부할 수 있었던 시간이었습니다.  
-오토에버에 구축된 머신비전 시스템은 공장에 있는 Edge 비전 시스템(GPU)과 비전 통합관리 시스템 + 클라우드에 있는 AI 플랫폼간의 통신이며,  
+오토에버에 구축된 머신비전 시스템은 공장에 있는 Edge 비전 시스템(GPU)과 비전 통합관리 시스템 + 클라우드에 있는 AI 플랫폼간의 통신으로 이루어지며,  
 클라우드에서 모델을 배포하고, 비전 통합관리 시스템에선 받은 모델을 edge시스템으로 전달하고 모니터링하며, edge에서 실제로 inference해서 검사이미지를 다시 학습이미지로 공급하는 구조라고 알고있습니다.  
 이 때 공장의 머신비전 장비는 PLC같은 산업용 장비로, 좀 더 raw한 통신을 하므로 통신계층(OSI)의 저계층에 있는 socket을 사용하며,  
-프로젝트는 HTTP를 사용하므로 메시지형식의 데이터를 다루어 윗계층에 있는 websocket을 사용한다는 차이가 있다는걸 알게 되었습니다.  
+프로젝트는 HTTP상에서의 실시간 통신으로 영상재생을 하고, 메시지형식의 데이터를 다루므로 윗계층에 있는 WebSocket을 사용한다는 차이가 있습니다.
 
-한편 validation loss에서 보여진 노이즈는 yolo의 데이터 증강[[7]](<https://docs.ultralytics.com/guides/preprocessing_annotated_data/#data-augmentation-methods>)으로 해결할 수 있을 것 같습니다. 하지만 웹캠의 화질이 낮다보니 조명에 민감하고 paint같은 미세한건 잘 감지해내지 못했던건 개선할 사항으로 남았습니다.  
 
 <br/>
   
 #### References
-Number Detection using YOLOV11. <https://www.kaggle.com/code/jadsherif/number-detection-using-yolov11/notebook>  
 [1]. You Only Look Once: Unified, Real-Time Object Detection. <https://arxiv.org/abs/1506.02640>  
 [2]. Object Detection Architecture - Difference between 1 and 2 stage detector. <https://velog.io/@qtly_u/Object-Detection-Architecture-1-or-2-stage-detector-%EC%B0%A8%EC%9D%B4>  
 [3]. Overview of Ultralytics YOLO11. <https://docs.ultralytics.com/models/yolo11/>  
